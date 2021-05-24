@@ -135,70 +135,29 @@ public class CakeManagementFragment extends Fragment {
     }
 
     private class ConvertToCakeList extends Thread {
-            @Override
-            public void run() {
-                try {
-                    JSONObject jObj = new JSONObject(resultList);
-                    JSONArray jArray = jObj.getJSONArray("cakes");
-                    for (int i = 0; i < jArray.length(); i++) {
-                        // 获取当前的JSONObject对象
-                        JSONObject jCake = jArray.getJSONObject(i);
-                        // 获取当前对象的属性和头像地址
-                        int id = jCake.getInt("id");
-                        String cakeName = jCake.getString("cakeName");
-                        String sellerPhone = jCake.getString("sellerPhone");
-                        String description = jCake.getString("description");
-                        String cakeImg = jCake.getString("cakeImg");
-                        int size = jCake.getInt("cakeSize");
-                        int price = jCake.getInt("cakePrice");
-                        Cake cake = new Cake(id, sellerPhone, cakeName, price, description, size, cakeImg);
-                        // 把当前的User对象添加到集合中
-                        cakes.add(cake);
-                    }
-                    // 拼接图片的服务端资源路径，进行下载
-                    for (int j = 0; j < cakes.size(); j++) {
-                        Cake cake = cakes.get(j);
-                        String cakeImg = cake.getCakeImg();
-                        // 拼接服务端地址
-                        String netHeader = ConfigUtil.SERVER_ADDR + cakeImg;
-                        // 通过网络请求下载
-                        URL imgUrl = new URL(netHeader);
-                        InputStream imgIn = imgUrl.openStream();
-                        String files = getContext().getFilesDir().getAbsolutePath();
-                        String imgs = files + "/images";
-                        // 判断目录是否存在
-                        File dirImgs = new File(imgs);
-                        if (!dirImgs.exists()) {
-                            // 如果目录不存在，则创建
-                            dirImgs.mkdir();
-                        }
-                        // 获取图片的名称（不包含服务器路径的图片名称）
-                        String[] strs = cake.getCakeImg().split("/");
-                        String imgName = strs[strs.length - 1];
-                        String imgPath = imgs + "/" + imgName;
-                        // 修改user对象的头像地址
-                        cake.setCakeImg(imgPath);
-                        // 获取本地文件输出流
-                        OutputStream out = new FileOutputStream(cake.getCakeImg());
-                        // 循环读写
-                        int b = -1;
-                        while ((b = imgIn.read()) != -1) {
-                            out.write(b);
-                            out.flush();
-                        }
-                        // 关闭流
-                        imgIn.close();
-                        out.close();
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
+        @Override
+        public void run() {
+            try {
+                JSONObject jObj = new JSONObject(resultList);
+                JSONArray jArray = jObj.getJSONArray("cakes");
+                for (int i = 0; i < jArray.length(); i++) {
+                    // 获取当前的JSONObject对象
+                    JSONObject jCake = jArray.getJSONObject(i);
+                    // 获取当前对象的属性和头像地址
+                    int id = jCake.getInt("id");
+                    String cakeName = jCake.getString("cakeName");
+                    String sellerPhone = jCake.getString("sellerPhone");
+                    String description = jCake.getString("description");
+                    String cakeImg = jCake.getString("cakeImg");
+                    int size = jCake.getInt("cakeSize");
+                    int price = jCake.getInt("cakePrice");
+                    Cake cake = new Cake(id, sellerPhone, cakeName, price, description, size, cakeImg);
+                    // 把当前的User对象添加到集合中
+                    cakes.add(cake);
                 }
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
+        }
     }
 }

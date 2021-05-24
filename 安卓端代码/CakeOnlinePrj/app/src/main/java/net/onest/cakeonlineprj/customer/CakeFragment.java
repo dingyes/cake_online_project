@@ -71,14 +71,6 @@ public class CakeFragment extends Fragment {
             switch (msg.what) {
                 case 1:
                     cakesInfo = (String) msg.obj;
-                    String files = getContext().getFilesDir().getAbsolutePath();
-                    String imgs = files + "/images";
-                    // 判断目录是否存在
-                    File dirImgs = new File(imgs);
-                    if (!dirImgs.exists()) {
-                        // 如果目录不存在，则创建
-                        dirImgs.mkdir();
-                    }
                     ConvertToCakeList toCakeList = new ConvertToCakeList();
                     toCakeList.start();
                     try {
@@ -222,39 +214,7 @@ public class CakeFragment extends Fragment {
                     // 把当前的User对象添加到集合中
                     cakes.add(cake);
                 }
-                for (Cake cake : cakes) {
-                    // 拼接服务端地址
-                    String netHeader = ConfigUtil.SERVER_ADDR + cake.getCakeImg();
-                    // 通过网络请求下载
-                    URL imgUrl = new URL(netHeader);
-                    InputStream imgIn = imgUrl.openStream();
-                    String files = getContext().getFilesDir().getAbsolutePath();
-                    String imgs = files + "/images";
-                    // 获取图片的名称（不包含服务器路径的图片名称）
-                    String[] strs = cake.getCakeImg().split("/");
-                    String imgName = strs[strs.length - 1];
-                    String imgPath = imgs + "/" + imgName;
-                    // 修改user对象的头像地址
-                    cake.setCakeImg(imgPath);
-                    // 获取本地文件输出流
-                    OutputStream out = new FileOutputStream(cake.getCakeImg());
-                    // 循环读写
-                    int b = -1;
-                    while ((b = imgIn.read()) != -1) {
-                        out.write(b);
-                        out.flush();
-                    }
-                    // 关闭流
-                    imgIn.close();
-                    out.close();
-                }
             } catch (JSONException e) {
-                e.printStackTrace();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
@@ -352,7 +312,6 @@ public class CakeFragment extends Fragment {
         public void run() {
             try {
                 String keyUrl = ConfigUtil.SERVER_ADDR + "/" + ConfigUtil.NET_HOME + "/KeywordSearchCake";
-                Log.e("search", keyUrl);
                 URL url = new URL(keyUrl);
                 URLConnection conn = url.openConnection();
                 conn.setDoInput(true);
@@ -369,7 +328,6 @@ public class CakeFragment extends Fragment {
                 InputStream in = conn.getInputStream();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(in, "utf-8"));
                 String result = reader.readLine();   // 关键词搜索蛋糕
-                Log.e("searchResult", result);
                 reader.close();
                 out.close();
                 Message message = new Message();
@@ -396,7 +354,6 @@ public class CakeFragment extends Fragment {
         try {
             JSONObject jObj = new JSONObject();
             jObj.put("key", keyResearch.getText().toString());
-            Log.e("keyword", keyResearch.getText().toString());
             jObj.put("size", cakeSize);
             jObj.put("price", cakePrice);
             json = jObj.toString();

@@ -1,6 +1,7 @@
 package net.onest.cakeonlineprj.Adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Handler;
 import android.os.Message;
@@ -8,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.TextView;
@@ -17,6 +19,7 @@ import androidx.annotation.NonNull;
 
 import net.onest.cakeonlineprj.R;
 import net.onest.cakeonlineprj.beans.OrderDetail;
+import net.onest.cakeonlineprj.seller.WebViewActivity;
 import net.onest.cakeonlineprj.util.ConfigUtil;
 
 import org.json.JSONException;
@@ -50,8 +53,10 @@ public class SellerOrderAdapter extends BaseAdapter {
                     if ("success".equals(result)) {
                         if (orders.get(currentPosition).getStatus() == TOBESENTOUT) {
                             orders.get(currentPosition).setStatus(DELIVERED);
+                            sendNotificationToCustomer();
                         } else if (orders.get(currentPosition).getStatus() == DELIVERED) {
                             orders.get(currentPosition).setStatus(HANDLED);
+                            sendNotificationToCustomer();
                         }
                         Toast.makeText(orderContext.getApplicationContext(), "订单状态修改成功", Toast.LENGTH_SHORT).show();
                         // 判断状态
@@ -63,6 +68,11 @@ public class SellerOrderAdapter extends BaseAdapter {
             }
         }
     };
+
+    private void sendNotificationToCustomer() {
+        Intent intent = new Intent(orderContext, WebViewActivity.class);
+        orderContext.startActivity(intent);
+    }
 
     public SellerOrderAdapter(Context orderContext, List<OrderDetail> orders, int itemLayoutRes) {
         this.orderContext = orderContext;

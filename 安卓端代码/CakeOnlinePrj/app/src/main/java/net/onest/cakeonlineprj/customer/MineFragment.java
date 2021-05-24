@@ -1,6 +1,7 @@
 package net.onest.cakeonlineprj.customer;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -23,6 +24,7 @@ import net.onest.cakeonlineprj.Adapter.HistoryOrderAdapter;
 import net.onest.cakeonlineprj.R;
 import net.onest.cakeonlineprj.beans.Customer;
 import net.onest.cakeonlineprj.beans.OrderDetail;
+import net.onest.cakeonlineprj.map.MapActivity;
 import net.onest.cakeonlineprj.util.ConfigUtil;
 
 import org.json.JSONArray;
@@ -52,6 +54,7 @@ public class MineFragment extends Fragment {
     private ImageView customerPhoto;
     private TextView nickname;
     private TextView customerPhone;
+    private Button btnMap;
     private Handler myHandler = new Handler() {
         @Override
         public void handleMessage(@NonNull Message msg) {
@@ -107,6 +110,13 @@ public class MineFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.fragment_mine, container, false);
         findViews();
+        btnMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), MapActivity.class);
+                startActivity(intent);
+            }
+        });
         return root;
     }
 
@@ -217,6 +227,7 @@ public class MineFragment extends Fragment {
         customerPhone = root.findViewById(R.id.customer_phone);
         nickname = root.findViewById(R.id.nickname);
         historyOrders = root.findViewById(R.id.history_order);
+        btnMap = root.findViewById(R.id.btn_map);
     }
 
     private Customer convertToObj(String cusJson) {

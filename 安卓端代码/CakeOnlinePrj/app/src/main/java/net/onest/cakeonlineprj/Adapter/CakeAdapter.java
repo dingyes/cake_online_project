@@ -11,6 +11,9 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+
 import net.onest.cakeonlineprj.R;
 import net.onest.cakeonlineprj.beans.Cake;
 import net.onest.cakeonlineprj.util.ConfigUtil;
@@ -25,7 +28,6 @@ public class CakeAdapter extends BaseAdapter {
     private Context cakeContext;
     private List<Cake> cakes = new ArrayList<>();
     private int itemLayoutRes;
-    private ImageView cakeImg;
 
     public CakeAdapter(Context cakeContext, List<Cake> cakes, int itemLayoutRes) {
         this.cakeContext = cakeContext;
@@ -58,21 +60,19 @@ public class CakeAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         LayoutInflater inflater = LayoutInflater.from(cakeContext);
         convertView = inflater.inflate(itemLayoutRes, null);
-        cakeImg = convertView.findViewById(R.id.cake_img);
+        ImageView cakeImg = convertView.findViewById(R.id.cake_img);
         TextView cakeName = convertView.findViewById(R.id.cake_name);
         TextView cakeSize = convertView.findViewById(R.id.cake_size);
         TextView cakePrice = convertView.findViewById(R.id.cake_price);
         cakeName.setText(cakes.get(position).getCakeName());
         cakeSize.setText(cakes.get(position).getSize() + "寸");
         cakePrice.setText(cakes.get(position).getPrice() + "");
-        try {
-            InputStream read = new FileInputStream(cakes.get(position).getCakeImg());
-            Bitmap img = BitmapFactory.decodeStream(read);
-            Bitmap bitmap = ConfigUtil.zoomBitmap(img, 150, 150);
-            cakeImg.setImageBitmap(bitmap);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+        Glide.with(cakeContext).load(ConfigUtil.SERVER_ADDR + "/" + cakes.get(position).getCakeImg())
+                .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)  // 默认的磁盘缓存策略
+                .placeholder(R.mipmap.loading)
+                .error(R.drawable.photo) // 永久加载失败时显示的图片
+                .fallback(R.drawable.photo)  // 表示图片地址为null时加载的图片
+                .into(cakeImg);
         return convertView;
     }
 }

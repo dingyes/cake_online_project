@@ -4,17 +4,17 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import net.onest.cakeonlineprj.R;
 import net.onest.cakeonlineprj.beans.Cake;
@@ -28,9 +28,6 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -81,13 +78,6 @@ public class CakeActivity extends AppCompatActivity {
                 case 3:
                     String cakeInfo = (String) msg.obj;
                     convertToCake(cakeInfo);
-                    DownloadCakeImage downloadCakeImage = new DownloadCakeImage();
-                    downloadCakeImage.start();
-                    try {
-                        downloadCakeImage.join();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
                     showDatas();
                     break;
             }
@@ -99,19 +89,17 @@ public class CakeActivity extends AppCompatActivity {
         cakePrice.setText(cake.getPrice() + "");
         cakeSize.setText(cake.getSize() + "寸");
         cakeSeller.setText(cake.getSellerPhone());
-        if ("".equals(cake.getDescription()) || null == cake.getDescription()){
+        if ("".equals(cake.getDescription()) || null == cake.getDescription()) {
             cakeDescription.setText("    卖家很懒，什么描述都没有留下呢~");
         } else {
             cakeDescription.setText("    " + cake.getDescription());
         }
-        try {
-            InputStream read = new FileInputStream(cake.getCakeImg());
-            Bitmap img = BitmapFactory.decodeStream(read);
-            Bitmap bitmap = ConfigUtil.zoomBitmap(img, 90, 90);
-            cakeImg.setImageBitmap(bitmap);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+        Glide.with(getApplicationContext()).load(ConfigUtil.SERVER_ADDR + "/" + cake.getCakeImg())
+                .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)  // 默认的磁盘缓存策略
+                .placeholder(R.mipmap.loading)
+                .error(R.drawable.photo) // 永久加载失败时显示的图片
+                .fallback(R.drawable.photo)  // 表示图片地址为null时加载的图片
+                .into(cakeImg);
     }
 
     private void convertToCake(String cakeInfo) {
@@ -359,47 +347,5 @@ public class CakeActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         return jObj.toString();
-    }
-
-    /**
-     * 下载图片
-     */
-    private class DownloadCakeImage extends Thread {
-        @Override
-        public void run() {
-            try {
-                // 拼接图片的服务端资源路径，进行下载
-                String cakeImg = cake.getCakeImg();
-                // 拼接服务端地址
-                String netHeader = ConfigUtil.SERVER_ADDR + cakeImg;
-                Log.e("image", netHeader);
-                // 通过网络请求下载
-                URL imgUrl = new URL(netHeader);
-                InputStream imgIn = imgUrl.openStream();
-                String files = getFilesDir().getAbsolutePath();
-                String imgs = files + "/images";
-                // 获取图片的名称（不包含服务器路径的图片名称）
-                String[] strs = cake.getCakeImg().split("/");
-                String imgName = strs[strs.length - 1];
-                String imgPath = imgs + "/" + imgName;
-                // 修改user对象的头像地址
-                cake.setCakeImg(imgPath);
-                // 获取本地文件输出流
-                OutputStream out = new FileOutputStream(cake.getCakeImg());
-                // 循环读写
-                int b = -1;
-                while ((b = imgIn.read()) != -1) {
-                    out.write(b);
-                    out.flush();
-                }
-                // 关闭流
-                imgIn.close();
-                out.close();
-            } catch (MalformedURLException ex) {
-                ex.printStackTrace();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        }
     }
 }

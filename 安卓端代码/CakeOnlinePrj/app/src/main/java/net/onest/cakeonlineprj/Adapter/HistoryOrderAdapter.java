@@ -1,8 +1,10 @@
 package net.onest.cakeonlineprj.Adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -98,12 +100,16 @@ public class HistoryOrderAdapter extends BaseAdapter {
             orderId.setText(orders.get(position).getId() + "");
             orderCakeName.setText(orders.get(position).getCakeName());
             orderCount.setText(orders.get(position).getCount() + "");
+            Log.e("tag", orders.get(position).getId() + ":" + orders.get(position).getStatus());
             if (orders.get(position).getStatus() == TOBESENTOUT) {
                 orderStatus.setText("待发货");
+                orderStatus.setTextColor(Color.RED);
             } else if (orders.get(position).getStatus() == DELIVERED) {
                 orderStatus.setText("已发货");
+                orderStatus.setTextColor(Color.BLUE);
             } else if (orders.get(position).getStatus() == HANDLED) {
                 orderStatus.setText("已完成订单");
+                orderStatus.setTextColor(Color.GRAY);
             } else {
                 orderStatus.setText("出错啦！");
             }

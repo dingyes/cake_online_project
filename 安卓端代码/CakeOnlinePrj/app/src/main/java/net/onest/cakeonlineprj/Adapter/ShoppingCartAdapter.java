@@ -18,6 +18,9 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+
 import net.onest.cakeonlineprj.R;
 import net.onest.cakeonlineprj.beans.Cake;
 import net.onest.cakeonlineprj.beans.Customer;
@@ -145,14 +148,12 @@ public class ShoppingCartAdapter extends BaseAdapter {
             }
         });
 
-        try {
-            InputStream read = new FileInputStream(items.get(position).getCakeImg());
-            Bitmap img = BitmapFactory.decodeStream(read);
-            Bitmap bitmap = ConfigUtil.zoomBitmap(img, 100, 100);
-            cakeImg.setImageBitmap(bitmap);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+        Glide.with(shoppingCartContext).load(ConfigUtil.SERVER_ADDR + "/" + items.get(position).getCakeImg())
+                .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)  // 默认的磁盘缓存策略
+                .placeholder(R.mipmap.loading)
+                .error(R.drawable.photo) // 永久加载失败时显示的图片
+                .fallback(R.drawable.photo)  // 表示图片地址为null时加载的图片
+                .into(cakeImg);
 
         btnOrder.setOnClickListener(new View.OnClickListener() {
             @Override

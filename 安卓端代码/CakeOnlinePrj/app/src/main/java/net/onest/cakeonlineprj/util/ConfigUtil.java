@@ -4,7 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.Matrix;
 
 public class ConfigUtil {
-    public static final String SERVER_ADDR = "http://10.7.90.156:8080";
+    public static final String SERVER_ADDR = "http://192.168.43.39:8080";
     public static final String NET_HOME = "CakeOnlineServer";
 
     /**

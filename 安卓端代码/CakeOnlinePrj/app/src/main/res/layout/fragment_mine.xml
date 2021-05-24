@@ -14,6 +14,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/colorWarm"
+            android:gravity="center_vertical"
             android:orientation="horizontal">
 
             <ImageView
@@ -43,6 +44,15 @@
                     android:textColor="@android:color/black"
                     android:textSize="18sp" />
             </LinearLayout>
+
+            <Button
+                android:id="@+id/btn_map"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:background="#b8f1cc"
+                android:text="定位"
+                android:textColor="@android:color/black" />
         </LinearLayout>
 
         <ListView

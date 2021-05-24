@@ -61,14 +61,6 @@ public class ShoppingCartFragment extends Fragment {
                 case 1:
                     String result = (String) msg.obj;
                     resultDetail = result;
-                    String files = getContext().getFilesDir().getAbsolutePath();
-                    String imgs = files + "/images";
-                    // 判断目录是否存在
-                    File dirImgs = new File(imgs);
-                    if (!dirImgs.exists()) {
-                        // 如果目录不存在，则创建
-                        dirImgs.mkdir();
-                    }
                     ConvertToDetailList detail = new ConvertToDetailList();
                     detail.start();
                     try {
@@ -80,7 +72,6 @@ public class ShoppingCartFragment extends Fragment {
                     break;
                 case 2:
                     String result1 = (String) msg.obj;
-                    Log.e("result1", result1);
                     if ("success".equals(result1)) {
                         items.clear();
                         scartAdapter.notifyDataSetChanged();
@@ -127,43 +118,7 @@ public class ShoppingCartFragment extends Fragment {
                     // 把当前的User对象添加到集合中
                     items.add(detail);
                 }
-                // 拼接图片的服务端资源路径，进行下载
-                for (int j = 0; j < items.size(); j++) {
-                    ShoppingCartItemDetail item = items.get(j);
-                    String cakeImage = item.getCakeImg();
-                    String[] strings = cakeImage.split("/");
-                    // 拼接服务端地址
-                    String netHeader = ConfigUtil.SERVER_ADDR + "/" + ConfigUtil.NET_HOME + "/images/" + strings[strings.length - 1];
-                    // 通过网络请求下载
-                    URL imgUrl = new URL(netHeader);
-                    InputStream imgIn = imgUrl.openStream();
-                    String files = getContext().getFilesDir().getAbsolutePath();
-                    String imgs = files + "/images";
-                    // 获取图片的名称（不包含服务器路径的图片名称）
-                    String[] strs = item.getCakeImg().split("/");
-                    String imgName = strs[strs.length - 1];
-                    String imgPath = imgs + "/" + imgName;
-                    // 修改user对象的头像地址
-                    item.setCakeImg(imgPath);
-                    // 获取本地文件输出流
-                    OutputStream out = new FileOutputStream(item.getCakeImg());
-                    // 循环读写
-                    int b = -1;
-                    while ((b = imgIn.read()) != -1) {
-                        out.write(b);
-                        out.flush();
-                    }
-                    // 关闭流
-                    imgIn.close();
-                    out.close();
-                }
             } catch (JSONException e) {
-                e.printStackTrace();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
@@ -202,11 +157,9 @@ public class ShoppingCartFragment extends Fragment {
                         jsonObject.put("cakeId", detail.getCakeId());
                         jsonObject.put("count", detail.getCakeCount());
                         array.put(jsonObject);
-                        Log.e("jsonObj", jsonObject.toString());
                     }
                     object.put("cakeCount", array);
                     object.put("phone", Customer.getCurrentCustomer());
-                    Log.e("url", s);
                     URL url = new URL(s);
                     URLConnection conn = url.openConnection();
                     conn.setDoInput(true);
@@ -216,7 +169,6 @@ public class ShoppingCartFragment extends Fragment {
                     // 将Json串写入
                     writer.write(object.toString() + "\n");
                     writer.flush();
-                    Log.e("shopping", object.toString());
                     InputStream in = conn.getInputStream();
                     BufferedReader reader = new BufferedReader(new InputStreamReader(in, "utf-8"));
                     String result = reader.readLine();
